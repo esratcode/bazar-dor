@@ -78,7 +78,7 @@ function ProductCard({ product, toggleSaved, isSaved }) {
       </div>
 
       <Link
-        href={`/products/${product.id}`}
+        href={`/product/${product.slug}`}
         className="mt-4 flex flex-1 flex-col"
       >
         <span className="w-fit rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-800">

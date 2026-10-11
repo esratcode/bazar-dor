@@ -1,59 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🛒 Bazar Dor — বাজার দর
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
+Bazar Dor is a responsive web application that helps users explore daily prices of essential products, compare market prices, and track price changes.
 
 ## 🌐 Live Website
 
-Visit the live website: [Bazar Dor](https://bazar-dor-two-nu.vercel.app/)
+🔗 https://bazar-dor-two-nu.vercel.app/
 
-## 🚀 Features
+## ✨ Features
 
 * View daily prices of essential products.
 * Search products by name.
 * Filter products by category.
 * Track price increases and decreases.
+* View detailed product information.
+* Compare minimum, maximum, and average prices.
+* Explore market-wise product prices.
 * Save favorite products.
 * User authentication with Better Auth.
+* Responsive design for mobile, tablet, and desktop.
+* Custom 404 page for invalid routes.
 
 ## 🛠️ Technologies Used
 
 * Next.js
 * React
+* JavaScript
 * Tailwind CSS
 * Better Auth
+* REST API
 * Vercel
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/esratcode/bazar-dor.git
+```
+
+### 2. Navigate to the project folder
+
+```bash
+cd bazar-dor
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Configure environment variables
+
+Create a `.env` file and configure the required authentication environment variables. Do not publish secret keys.
+
+### 5. Run the development server
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000 in your browser.
+
+## 📂 Repository
+
+🔗 https://github.com/esratcode/bazar-dor
+
+## 👩‍💻 Developer
+
+Developed as part of a Next.js assignment to explore product data fetching, routing, authentication, and responsive UI development.

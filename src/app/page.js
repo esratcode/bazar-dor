@@ -8,35 +8,40 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("সব");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     let isMounted = true;
 
-    fetch("https://api.api-store.workers.dev/api/bazardor/products")
-      .then((response) => {
+    async function loadProducts() {
+      try {
+        const response = await fetch(
+          "https://api.api-store.workers.dev/api/bazardor/products",
+        );
+
         if (!response.ok) {
           throw new Error("পণ্যের তথ্য লোড করা যায়নি");
         }
 
-        return response.json();
-      })
-      .then((data) => {
+        const data = await response.json();
+
         if (isMounted) {
           setProducts(Array.isArray(data) ? data : []);
         }
-      })
-      .catch((error) => {
-        console.error("Products fetch error:", error);
+      } catch (err) {
+        console.error("Products fetch error:", err);
 
         if (isMounted) {
           setError("পণ্যের তথ্য লোড করা যায়নি। আবার চেষ্টা করো।");
         }
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) {
           setLoading(false);
         }
-      });
+      }
+    }
+
+    loadProducts();
 
     return () => {
       isMounted = false;
@@ -52,13 +57,21 @@ export default function Home() {
     ),
   ];
 
-  const filteredProducts =
-    selectedCategory === "সব"
-      ? products
-      : products.filter(
-          (product) =>
-            (product.categoryNameBn || product.category) === selectedCategory,
-        );
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      selectedCategory === "সব" ||
+      (product.categoryNameBn || product.category) === selectedCategory;
+
+    const query = searchTerm.trim().toLowerCase();
+
+    const matchesSearch =
+      (product.nameBn || "").toLowerCase().includes(query) ||
+      (product.name || "").toLowerCase().includes(query) ||
+      (product.categoryNameBn || "").toLowerCase().includes(query) ||
+      (product.category || "").toLowerCase().includes(query);
+
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -107,6 +120,20 @@ export default function Home() {
             )}
           </div>
 
+          {/* Search Box */}
+          {!loading && !error && (
+            <div className="mt-5">
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="পণ্যের নাম লিখে খুঁজুন..."
+                aria-label="পণ্য খুঁজুন"
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-green-600 focus:ring-2 focus:ring-green-100"
+              />
+            </div>
+          )}
+
           {/* Category Filter */}
           {!loading && !error && products.length > 0 && (
             <div className="mt-5 flex flex-wrap gap-3">
@@ -138,7 +165,7 @@ export default function Home() {
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="mt-6 rounded-xl border bg-white p-8 text-center text-gray-500">
-              কোনো পণ্যের তথ্য পাওয়া যায়নি।
+              কোনো পণ্য পাওয়া যায়নি। অন্য নাম দিয়ে খুঁজে দেখো।
             </div>
           ) : (
             /* Product Cards */

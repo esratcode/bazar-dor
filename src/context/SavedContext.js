@@ -16,7 +16,12 @@ export function SavedProvider({ children }) {
         const parsed = JSON.parse(stored);
 
         if (Array.isArray(parsed)) {
-          setSavedProducts(parsed);
+          setSavedProducts(
+            parsed.filter(
+              (product) =>
+                product && product.id !== undefined && product.id !== null,
+            ),
+          );
         }
       }
     } catch (error) {
@@ -27,20 +32,32 @@ export function SavedProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (!isLoaded) return;
+
+    try {
       localStorage.setItem("savedProducts", JSON.stringify(savedProducts));
+    } catch (error) {
+      console.error("Saved products save error:", error);
     }
   }, [savedProducts, isLoaded]);
 
   function toggleSaved(product) {
+    if (!product || product.id === undefined || product.id === null) {
+      return;
+    }
+
     setSavedProducts((previous) => {
       const exists = previous.some(
         (item) => String(item.id) === String(product.id),
       );
 
-      return exists
-        ? previous.filter((item) => String(item.id) !== String(product.id))
-        : [...previous, product];
+      if (exists) {
+        return previous.filter(
+          (item) => String(item.id) !== String(product.id),
+        );
+      }
+
+      return [...previous, product];
     });
   }
 
@@ -49,7 +66,9 @@ export function SavedProvider({ children }) {
   }
 
   return (
-    <SavedContext.Provider value={{ savedProducts, toggleSaved, isSaved }}>
+    <SavedContext.Provider
+      value={{ savedProducts, toggleSaved, isSaved, isLoaded }}
+    >
       {children}
     </SavedContext.Provider>
   );

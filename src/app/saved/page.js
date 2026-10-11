@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSaved } from "@/context/SavedContext";
+import { useSaved } from "../../context/SavedContext";
 
 export default function SavedPage() {
   const { savedProducts, toggleSaved } = useSaved();

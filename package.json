@@ -9,12 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "better-auth": "^1.7.7",
+    "better-sqlite3": "^13.0.3",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4"

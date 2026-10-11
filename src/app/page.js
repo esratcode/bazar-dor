@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useSaved } from "@/context/SavedContext";
+import { useSaved } from "../context/SavedContext";
 
 const API_URL = "https://api.api-store.workers.dev/api/bazardor/products";
 
@@ -24,7 +24,6 @@ function toBengaliNumber(value) {
 
 function getChange(product) {
   const change = Number(product.change?.pct);
-
   return Number.isFinite(change) ? change : 0;
 }
 
@@ -34,7 +33,6 @@ function PriceChange({ product }) {
 
   const isUp = direction === "up";
   const isDown = direction === "down";
-  const isFlat = !isUp && !isDown;
 
   return (
     <p
@@ -54,6 +52,7 @@ function PriceChange({ product }) {
 
 function ProductCard({ product, toggleSaved, isSaved }) {
   const saved = isSaved(product.id);
+  const productUrl = `/product/${product.slug ?? product.id}`;
 
   return (
     <article className="group flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-500 hover:shadow-lg">
@@ -77,10 +76,7 @@ function ProductCard({ product, toggleSaved, isSaved }) {
         </button>
       </div>
 
-      <Link
-        href={`/product/${product.slug}`}
-        className="mt-4 flex flex-1 flex-col"
-      >
+      <Link href={productUrl} className="mt-4 flex flex-1 flex-col">
         <span className="w-fit rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-800">
           {product.categoryNameBn || product.category || "অন্যান্য"}
         </span>
@@ -106,7 +102,6 @@ function ProductCard({ product, toggleSaved, isSaved }) {
           <p className="text-sm text-gray-500">
             গতকালের দাম: ৳{toBengaliNumber(product.yesterday)}
           </p>
-
           <p className="mt-3 font-semibold text-green-700">বিস্তারিত দেখুন →</p>
         </div>
       </Link>
@@ -191,12 +186,13 @@ export default function Home() {
 
         const data = await response.json();
 
-        // API may return an array directly or inside a data property.
         const productList = Array.isArray(data)
           ? data
           : Array.isArray(data?.data)
             ? data.data
-            : [];
+            : Array.isArray(data?.products)
+              ? data.products
+              : [];
 
         setProducts(productList);
         setError("");
@@ -255,6 +251,7 @@ export default function Home() {
   const { risers, fallers } = useMemo(() => {
     const changedProducts = products.filter((product) => {
       const direction = product.change?.dir;
+
       return (
         (direction === "up" || direction === "down") &&
         Number.isFinite(Number(product.change?.pct))
@@ -290,7 +287,7 @@ export default function Home() {
               হোম
             </Link>
 
-            <Link href="#সব-পণ্য" className="transition hover:text-green-700">
+            <Link href="/#সব-পণ্য" className="transition hover:text-green-700">
               সব পণ্য
             </Link>
 
@@ -342,6 +339,7 @@ export default function Home() {
                 </span>
               </span>
             ))}
+
             {products.length === 0 && (
               <span>🛒 প্রতিদিনের বাজারদর এক নজরে</span>
             )}
@@ -383,10 +381,12 @@ export default function Home() {
                   </strong>
                   পণ্যের তথ্য
                 </p>
+
                 <p>
                   <strong className="block text-2xl text-white">📊</strong>
                   দামের পরিবর্তন
                 </p>
+
                 <p>
                   <strong className="block text-2xl text-white">♥</strong>
                   পছন্দের তালিকা
@@ -396,6 +396,7 @@ export default function Home() {
 
             <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center rounded-full border border-white/20 bg-white/10 shadow-2xl">
               <div className="absolute inset-6 rounded-full border border-dashed border-lime-200/50" />
+
               <div className="relative text-center">
                 <span className="block text-8xl sm:text-9xl">🧺</span>
                 <p className="mt-5 text-xl font-bold text-lime-200">
@@ -405,9 +406,11 @@ export default function Home() {
                   দাম জেনে বাজার করুন
                 </p>
               </div>
+
               <span className="absolute left-4 top-10 rounded-2xl bg-white p-4 text-3xl shadow-xl sm:left-8">
                 🥦
               </span>
+
               <span className="absolute bottom-10 right-4 rounded-2xl bg-white p-4 text-3xl shadow-xl sm:right-8">
                 🍅
               </span>
@@ -444,9 +447,11 @@ export default function Home() {
                 <p className="font-semibold text-green-700">
                   আপনার বাজারের সঙ্গী
                 </p>
+
                 <h2 className="mt-2 text-2xl font-extrabold sm:text-3xl">
                   সব পণ্যের বাজারদর
                 </h2>
+
                 <p className="mt-2 text-sm text-gray-500">
                   পণ্য খুঁজুন, দাম তুলনা করুন এবং পছন্দের পণ্য সংরক্ষণ করুন।
                 </p>
@@ -465,6 +470,7 @@ export default function Home() {
                   <label htmlFor="product-search" className="sr-only">
                     পণ্য খুঁজুন
                   </label>
+
                   <input
                     id="product-search"
                     type="search"
@@ -501,6 +507,7 @@ export default function Home() {
                 className="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-red-700"
               >
                 <p>{error}</p>
+
                 <button
                   type="button"
                   onClick={() => window.location.reload()}
@@ -528,12 +535,15 @@ export default function Home() {
                 ) : filteredProducts.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
                     <span className="text-5xl">🔎</span>
+
                     <h3 className="mt-4 text-xl font-bold">
                       কোনো পণ্য পাওয়া যায়নি
                     </h3>
+
                     <p className="mt-2 text-gray-500">
                       অন্য নাম দিয়ে খুঁজুন অথবা অন্য ক্যাটাগরি বেছে নিন।
                     </p>
+
                     <button
                       type="button"
                       onClick={() => {
@@ -566,9 +576,12 @@ export default function Home() {
       <footer className="mt-12 border-t border-gray-200 bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-semibold text-gray-700">
-            বাজার দর — প্রয়োজনীয় পণ্যের দাম এক নজরে।
+            বাজার দর — প্রয়োজনীয় পণ্যের দাম এক নজরে।
           </p>
-          <p>সকল দাম সম্ভাব্য; বাজার অবস্থার ওপর নির্ভর করে পরিবর্তিত হয়।</p>
+
+          <p>
+            সকল দাম সম্ভাব্য; বাজারের অবস্থার ওপর নির্ভর করে পরিবর্তিত হতে পারে।
+          </p>
         </div>
       </footer>
     </div>

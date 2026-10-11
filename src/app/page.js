@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useSaved } from "../context/SavedContext";
+import { authClient } from "../lib/auth-client";
 
 const API_URL = "https://api.api-store.workers.dev/api/bazardor/products";
 
@@ -168,8 +169,33 @@ export default function Home() {
   const [error, setError] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("সব");
   const [searchTerm, setSearchTerm] = useState("");
+  const [signingOut, setSigningOut] = useState(false);
 
   const { toggleSaved, isSaved } = useSaved();
+
+  // Better Auth session
+  const { data: session, isPending } = authClient.useSession();
+
+  async function handleSignOut() {
+    setSigningOut(true);
+
+    try {
+      const result = await authClient.signOut();
+
+      if (result.error) {
+        console.error("Sign out error:", result.error);
+        alert("লগ আউট করা যায়নি। আবার চেষ্টা করো।");
+        return;
+      }
+
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Sign out error:", err);
+      alert("লগ আউট করার সময় সমস্যা হয়েছে। আবার চেষ্টা করো।");
+    } finally {
+      setSigningOut(false);
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -295,19 +321,40 @@ export default function Home() {
               ♥ সংরক্ষিত
             </Link>
 
-            <Link
-              href="/signin"
-              className="rounded-full bg-green-700 px-4 py-2 text-white transition hover:bg-green-800"
-            >
-              সাইন ইন
-            </Link>
+            {isPending ? (
+              <span className="px-3 py-2 text-gray-400">লোড হচ্ছে...</span>
+            ) : session?.user ? (
+              <>
+                <span className="max-w-32 truncate text-green-800">
+                  👋 {session.user.name || session.user.email}
+                </span>
 
-            <Link
-              href="/signup"
-              className="rounded-full border border-green-700 px-4 py-2 text-green-800 transition hover:bg-green-50"
-            >
-              সাইন আপ
-            </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={signingOut}
+                  className="rounded-full bg-red-600 px-4 py-2 text-white transition hover:bg-red-700 disabled:opacity-60"
+                >
+                  {signingOut ? "লগ আউট হচ্ছে..." : "লগ আউট"}
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-full bg-green-700 px-4 py-2 text-white transition hover:bg-green-800"
+                >
+                  সাইন ইন
+                </Link>
+
+                <Link
+                  href="/signup"
+                  className="rounded-full border border-green-700 px-4 py-2 text-green-800 transition hover:bg-green-50"
+                >
+                  সাইন আপ
+                </Link>
+              </>
+            )}
           </div>
         </nav>
 
